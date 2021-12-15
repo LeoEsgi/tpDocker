@@ -1,0 +1,22 @@
+// Create bridge network MyBridgedNetwork on 172.1.1.0/24
+docker network create -d bridge --subnet=172.1.1.0/24 MyBridgedNetwork
+// Create and run container web nginx and attach to network MyBridgedNetwork
+docker run -d -it --network MyBridgedNetwork --name web nginx:mainline-alpine
+// Create and run container web nginx and attach to network MyBridgedNetwork
+docker run -d -it --network MyBridgedNetwork --name db mongo:4.2.2
+// Create volume bdd
+sudo docker volume create bdd
+// Create and run container bdd mongo with bdd volume on network MyBridgedNetwork
+docker run -d --network MyBridgedNetwork --name bdd mongo --mount source=bdd,destination=/bdd
+// Create bridge network BCNetwork on 172.2.2.0/24 
+docker network create -d bridge --subnet=172.2.2.0/24 BCNetwork
+
+
+// Create volume blockchain
+docker volume create blockchain
+// build and run ethereum node
+docker build -t geth ./geth
+docker run -d -it --network BCNetwork --mount source=blockchain,destination=/blockchain --name geth geth
+
+// run docker compose
+docker-compose up -d --build
